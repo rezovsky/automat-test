@@ -7,7 +7,7 @@ from pywinauto.application import Application
 import configparser
 
 
-def open_app(action_key, link, links, count, chrome_app):
+def open_app(action_key, link, links, count, chrome_app, js):
     app = Application().start(chrome_app)
     app = Application(backend="win32").connect(title_re='Новая', timeout=5)
 
@@ -21,7 +21,15 @@ def open_app(action_key, link, links, count, chrome_app):
     for action in actions:
         find_img(action.strip())
 
-    sleep(1)
+    sleep(2)
+    keyboard.send_keys("{F12}")
+    sleep(2)
+    find_img("console")
+    keyboard.send_keys(js + "{ENTER}", pause=0.0001)
+    sleep(2)
+    keyboard.send_keys("{F12}")
+    sleep(2)
+
     if count > 0:
         keyboard.send_keys("{VK_SHIFT down}{LWIN down}" + action_key + "{LWIN up}{VK_SHIFT up}")
 
@@ -78,13 +86,14 @@ def main():
     monitors_count = int(settings.get('settings', 'monitors'))
     reloat_time = int(settings.get('settings', 'reload'))
     title_pattern = settings.get('settings', 'title_pattern')
+    js = settings.get('settings', 'js')
     orientation = settings.get('settings', 'orientation')
     chrome_app = settings.get('settings', 'chrome')
 
     links = settings.get('links', 'links').split(',')
 
     for count in range(monitors_count):
-        open_app(actions[orientation], link, links[count], count, chrome_app)
+        open_app(actions[orientation], link, links[count], count, chrome_app, js)
 
     reload_counter = 0
 
@@ -99,7 +108,7 @@ def main():
             reload_counter = 0
             for app in apps:
                 windows = app.rectangle()
-                press_reload(windows)
+                # press_reload(windows)
 
 
 def get_apps(title_pattern):
@@ -110,4 +119,3 @@ def get_apps(title_pattern):
 if __name__ == '__main__':
     while True:
         main()
-
