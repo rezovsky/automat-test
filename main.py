@@ -95,6 +95,8 @@ def main():
     for count in range(monitors_count):
         open_app(actions[orientation], link, links[count], count, chrome_app, js)
 
+    keyboard.send_keys("%{TAB}")
+
     reload_counter = 0
 
     while True:
